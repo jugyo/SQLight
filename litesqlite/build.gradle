@@ -1,0 +1,24 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion versions.compileSdk
+    defaultConfig.minSdkVersion 21
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+    }
+
+    lintOptions {
+        abortOnError true
+    }
+    namespace 'org.jugyo.litesqlite'
+}
+
+dependencies {
+    testImplementation "junit:junit:4.13.2"
+}
