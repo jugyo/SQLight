@@ -55,11 +55,11 @@ class SQLightTest {
             .build()
 
         sqlight.execSQL(
-            """DELETE FROM user;""",
-            """INSERT INTO user (id, name, gender) VALUES (0, 'John Doe', 'Male');""",
-            """INSERT INTO user (id, name, gender) VALUES (1, 'Sam Smith', 'Male');""",
-            """INSERT INTO user (id, name, gender) VALUES (2, 'Jane Doe', 'Female');""",
-            """INSERT INTO user (id, name, gender) VALUES (3, 'Emma Brown', 'Female');"""
+            """DELETE FROM user""",
+            """INSERT INTO user (id, name, gender) VALUES (0, 'John Doe', 'Male')""",
+            """INSERT INTO user (id, name, gender) VALUES (1, 'Sam Smith', 'Male')""",
+            """INSERT INTO user (id, name, gender) VALUES (2, 'Jane Doe', 'Female')""",
+            """INSERT INTO user (id, name, gender) VALUES (3, 'Emma Brown', 'Female')"""
         )
     }
 
@@ -102,8 +102,8 @@ class SQLightTest {
     @Test
     fun execSQL() = runTest {
         sqlight.execSQL(
-            """INSERT INTO user (id, name, gender) VALUES (4, 'user1', 'Male');""",
-            """INSERT INTO user (id, name, gender) VALUES (5, 'user2', 'Female');""",
+            """INSERT INTO user (id, name, gender) VALUES (4, 'user1', 'Male')""",
+            """INSERT INTO user (id, name, gender) VALUES (5, 'user2', 'Female')""",
         )
         val count = sqlight.rawQuery("SELECT count(*) FROM user") {
             it.getInt(0)
@@ -115,7 +115,7 @@ class SQLightTest {
     @Test
     fun execSQLWithBindArgs() = runTest {
         sqlight.execSQL(
-            """INSERT INTO user (id, name, gender) VALUES (?, ?, ?);""",
+            """INSERT INTO user (id, name, gender) VALUES (?, ?, ?)""",
             listOf("4", "user1", "Male")
         )
         val record = sqlight.rawQuery("SELECT * FROM user WHERE id = 4", ::map).first()
@@ -147,14 +147,14 @@ class SQLightTest {
                     Log.d("SQLightTest", it)
                 }
                 .onCreate { db ->
-                    db.execSQL("CREATE TABLE table1( id integer PRIMARY KEY AUTOINCREMENT, column1 text NOT NULL);")
+                    db.execSQL("CREATE TABLE table1( id integer PRIMARY KEY AUTOINCREMENT, column1 text NOT NULL)")
                 }
                 .onMigrate { db, version ->
                     when (version) {
-                        2 -> db.execSQL("ALTER TABLE table1 ADD COLUMN column2 text;")
-                        3 -> db.execSQL("ALTER TABLE table1 ADD COLUMN column3 text;")
-                        4 -> db.execSQL("ALTER TABLE table1 ADD COLUMN column4 text;")
-                        5 -> db.execSQL("ALTER TABLE table1 ADD COLUMN column5 text;")
+                        2 -> db.execSQL("ALTER TABLE table1 ADD COLUMN column2 text")
+                        3 -> db.execSQL("ALTER TABLE table1 ADD COLUMN column3 text")
+                        4 -> db.execSQL("ALTER TABLE table1 ADD COLUMN column4 text")
+                        5 -> db.execSQL("ALTER TABLE table1 ADD COLUMN column5 text")
                     }
                 }
                 .build()
@@ -180,25 +180,25 @@ class SQLightTest {
 
         var sqlight = create(version = 1)
         assertEquals(
-            listOf("column1"),
+            listOf("id", "column1"),
             sqlight.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
         )
 
         sqlight = create(version = 2)
         assertEquals(
-            listOf("column1", "column2"),
+            listOf("id", "column1", "column2"),
             sqlight.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
         )
 
         sqlight = create(version = 3)
         assertEquals(
-            listOf("column1", "column2", "column3"),
+            listOf("id", "column1", "column2", "column3"),
             sqlight.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
         )
 
         sqlight = create(version = 5)
         assertEquals(
-            listOf("column1", "column2", "column3", "column4", "column5"),
+            listOf("id", "column1", "column2", "column3", "column4", "column5"),
             sqlight.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
         )
     }

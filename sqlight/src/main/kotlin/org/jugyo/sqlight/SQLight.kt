@@ -28,7 +28,7 @@ class SQLight private constructor(
     private var logger: (message: String) -> Unit = {}
 
     /**
-     * Executes a raw SQL query and returns a list of entity.
+     * Query with a raw SQL and returns a list of entity.
      *
      * @param sql the SQL query to execute
      * @param selectionArgs the arguments to replace placeholders in the SQL query
@@ -46,9 +46,9 @@ class SQLight private constructor(
         val records = mutableListOf<T>()
 
         if (cursor.moveToFirst()) {
-            while (cursor.moveToNext()) {
+            do {
                 records.add(mapper(cursor))
-            }
+            } while (cursor.moveToNext())
             cursor.close()
         }
 
@@ -56,7 +56,7 @@ class SQLight private constructor(
     }
 
     /**
-     * Executes a raw SQL query and returns a list of entity.
+     * Query with a raw SQL and returns a list of entity.
      *
      * @param sql the SQL query to execute
      * @param mapper the function that maps raw data to an entity class instance
@@ -67,6 +67,11 @@ class SQLight private constructor(
         mapper: (Cursor) -> T
     ) = rawQuery(sql, null, mapper)
 
+    /**
+     * Execute a raw SQL
+     *
+     * @param sql the SQL query to execute
+     */
     suspend fun execSQL(
         vararg sql: String
     ) = withContext(Dispatchers.IO) {
@@ -76,6 +81,12 @@ class SQLight private constructor(
         }
     }
 
+    /**
+     * Execute a raw SQL
+     *
+     * @param sql the SQL query to execute
+     * @param bindArgs the arguments to replace placeholders in the SQL query
+     */
     suspend fun execSQL(
         sql: String,
         bindArgs: List<String>
@@ -84,6 +95,9 @@ class SQLight private constructor(
         sqlite.writableDatabase.execSQL(sql, bindArgs.toTypedArray())
     }
 
+    /**
+     * Close the database
+     */
     fun close() {
         sqlite.close()
     }
