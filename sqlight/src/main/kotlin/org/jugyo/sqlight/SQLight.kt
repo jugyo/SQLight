@@ -1,4 +1,4 @@
-package org.jugyo.litesqlite
+package org.jugyo.sqlight
 
 import android.content.Context
 import android.database.Cursor
@@ -12,7 +12,7 @@ import kotlinx.coroutines.withContext
  * - It does not take care of database migration.
  * - Don't forget to specify the database version you are using with your OR mapper.
  */
-class LiteSQLite private constructor(
+class SQLight private constructor(
     context: Context,
     databaseName: String,
     databaseVersion: Int
@@ -110,11 +110,11 @@ class LiteSQLite private constructor(
         databaseVersion
     ) {
         override fun onCreate(db: SQLiteDatabase) {
-            this@LiteSQLite.onCreate(db)
+            this@SQLight.onCreate(db)
         }
 
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-            this@LiteSQLite.onUpgrade(db, oldVersion, newVersion)
+            this@SQLight.onUpgrade(db, oldVersion, newVersion)
         }
     }
 
@@ -142,8 +142,8 @@ class LiteSQLite private constructor(
             return this
         }
 
-        fun build(): LiteSQLite {
-            return LiteSQLite(
+        fun build(): SQLight {
+            return SQLight(
                 context = context,
                 databaseName = databaseName,
                 databaseVersion = databaseVersion

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "org.jugyo.litesqlite"
+    namespace = "org.jugyo.sqlight"
 
     compileSdk = 33
 
@@ -27,7 +27,7 @@ android {
         abortOnError = true
     }
 
-    resourcePrefix("org.jugyo.litesqlite")
+    resourcePrefix("org.jugyo.sqlight")
 }
 
 dependencies {

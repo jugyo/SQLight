@@ -11,7 +11,7 @@
         tools:ignore="AllowBackup">
 
         <activity
-            android:name="org.jugyo.litesqlite.sample.MainActivity"
+            android:name="org.jugyo.sqlight.sample.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

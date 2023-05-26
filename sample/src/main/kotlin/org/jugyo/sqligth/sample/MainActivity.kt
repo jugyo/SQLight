@@ -1,4 +1,4 @@
-package org.jugyo.litesqlite.sample
+package org.jugyo.sqlight.sample
 
 import android.content.Intent
 import android.os.Bundle

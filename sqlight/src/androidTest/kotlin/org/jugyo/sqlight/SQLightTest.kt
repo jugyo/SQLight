@@ -1,4 +1,4 @@
-package org.jugyo.litesqlite
+package org.jugyo.sqlight
 
 import android.content.Context
 import android.database.Cursor
@@ -25,21 +25,21 @@ fun map(cursor: Cursor) = User(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
-class LiteSQLiteTest {
-    private lateinit var liteSQLite: LiteSQLite
+class SQLightTest {
+    private lateinit var sqlight: SQLight
 
     @Before
     fun setUp() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<Context>()
         context.deleteDatabase("TestDatabase.db")
 
-        liteSQLite = LiteSQLite.Builder(
+        sqlight = SQLight.Builder(
             context,
             "TestDatabase.db",
             1
         )
             .setLogger {
-                Log.d("LiteSQLiteTest", it)
+                Log.d("SQLightTest", it)
             }
             .onCreate {
                 it.execSQL(
@@ -54,7 +54,7 @@ class LiteSQLiteTest {
             }
             .build()
 
-        liteSQLite.execSQL(
+        sqlight.execSQL(
             """DELETE FROM user;""",
             """INSERT INTO user (id, name, gender) VALUES (0, 'John Doe', 'Male');""",
             """INSERT INTO user (id, name, gender) VALUES (1, 'Sam Smith', 'Male');""",
@@ -65,21 +65,21 @@ class LiteSQLiteTest {
 
     @Test
     fun rawQuery() = runTest {
-        var records = liteSQLite.rawQuery("SELECT * FROM user ORDER BY id", ::map)
+        var records = sqlight.rawQuery("SELECT * FROM user ORDER BY id", ::map)
         assertEquals(4, records.size)
         assertEquals(User(id = 0, name = "John Doe", gender = "Male"), records[0])
         assertEquals(User(id = 1, name = "Sam Smith", gender = "Male"), records[1])
         assertEquals(User(id = 2, name = "Jane Doe", gender = "Female"), records[2])
         assertEquals(User(id = 3, name = "Emma Brown", gender = "Female"), records[3])
 
-        records = liteSQLite.rawQuery("SELECT * FROM user WHERE id = ?", listOf("1"), ::map)
+        records = sqlight.rawQuery("SELECT * FROM user WHERE id = ?", listOf("1"), ::map)
         assertEquals(1, records.size)
         assertEquals(User(id = 1, name = "Sam Smith", gender = "Male"), records[0])
     }
 
     @Test
     fun rawQueryWithSelectionArgs() = runTest {
-        val records = liteSQLite.rawQuery("SELECT * FROM user WHERE id = ?", listOf("0"), ::map)
+        val records = sqlight.rawQuery("SELECT * FROM user WHERE id = ?", listOf("0"), ::map)
         assertEquals(1, records.size)
         assertEquals(User(id = 0, name = "John Doe", gender = "Male"), records[0])
     }
@@ -88,24 +88,24 @@ class LiteSQLiteTest {
     fun rawQueryThrowsExceptionOnSqlSyntaxError() = runTest {
         assertThrows(SQLiteException::class.java) {
             runBlocking {
-                liteSQLite.rawQuery("SELECT", ::map)
+                sqlight.rawQuery("SELECT", ::map)
             }
         }
 
         assertThrows(IllegalArgumentException::class.java) {
             runBlocking {
-                liteSQLite.rawQuery("SELECT * FROM user", listOf("1"), ::map)
+                sqlight.rawQuery("SELECT * FROM user", listOf("1"), ::map)
             }
         }
     }
 
     @Test
     fun execSQL() = runTest {
-        liteSQLite.execSQL(
+        sqlight.execSQL(
             """INSERT INTO user (id, name, gender) VALUES (4, 'user1', 'Male');""",
             """INSERT INTO user (id, name, gender) VALUES (5, 'user2', 'Female');""",
         )
-        val count = liteSQLite.rawQuery("SELECT count(*) FROM user") {
+        val count = sqlight.rawQuery("SELECT count(*) FROM user") {
             it.getInt(0)
         }.first()
 
@@ -114,11 +114,11 @@ class LiteSQLiteTest {
 
     @Test
     fun execSQLWithBindArgs() = runTest {
-        liteSQLite.execSQL(
+        sqlight.execSQL(
             """INSERT INTO user (id, name, gender) VALUES (?, ?, ?);""",
             listOf("4", "user1", "Male")
         )
-        val record = liteSQLite.rawQuery("SELECT * FROM user WHERE id = 4", ::map).first()
+        val record = sqlight.rawQuery("SELECT * FROM user WHERE id = 4", ::map).first()
 
         assertEquals(User(id = 4, name = "user1", gender = "Male"), record)
     }
@@ -127,7 +127,7 @@ class LiteSQLiteTest {
     fun execSQLThrowsExceptionOnSqlSyntaxError() = runTest {
         assertThrows(SQLiteException::class.java) {
             runBlocking {
-                liteSQLite.execSQL("""INSERT INTO user (id, name""")
+                sqlight.execSQL("""INSERT INTO user (id, name""")
             }
         }
     }
@@ -137,14 +137,14 @@ class LiteSQLiteTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         context.deleteDatabase("TestDatabase-2.db")
 
-        fun create(version: Int): LiteSQLite {
-            return LiteSQLite.Builder(
+        fun create(version: Int): SQLight {
+            return SQLight.Builder(
                 context,
                 "TestDatabase-2.db",
                 version
             )
                 .setLogger {
-                    Log.d("LiteSQLiteTest", it)
+                    Log.d("SQLightTest", it)
                 }
                 .onCreate { db ->
                     db.execSQL("CREATE TABLE table1( id integer PRIMARY KEY AUTOINCREMENT, column1 text NOT NULL);")
@@ -178,28 +178,28 @@ class LiteSQLiteTest {
             )
         }
 
-        var liteSQLite = create(version = 1)
+        var sqlight = create(version = 1)
         assertEquals(
             listOf("column1"),
-            liteSQLite.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
+            sqlight.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
         )
 
-        liteSQLite = create(version = 2)
+        sqlight = create(version = 2)
         assertEquals(
             listOf("column1", "column2"),
-            liteSQLite.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
+            sqlight.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
         )
 
-        liteSQLite = create(version = 3)
+        sqlight = create(version = 3)
         assertEquals(
             listOf("column1", "column2", "column3"),
-            liteSQLite.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
+            sqlight.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
         )
 
-        liteSQLite = create(version = 5)
+        sqlight = create(version = 5)
         assertEquals(
             listOf("column1", "column2", "column3", "column4", "column5"),
-            liteSQLite.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
+            sqlight.rawQuery("PRAGMA table_info(table1)", ::map).map { it.name }
         )
     }
 }

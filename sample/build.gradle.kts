@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    namespace = "org.jugyo.litesqlite.sample"
+    namespace = "org.jugyo.sqlight.sample"
 
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "org.jugyo.litesqlite.sample"
+        applicationId = "org.jugyo.sqlight.sample"
         minSdk = 26
         targetSdk = 33
         versionCode = 1
@@ -38,11 +38,11 @@ android {
         abortOnError = true
     }
 
-    resourcePrefix("org.jugyo.litesqlite.sample")
+    resourcePrefix("org.jugyo.sqlight.sample")
 }
 
 dependencies {
-    implementation(project(":litesqlite"))
+    implementation(project(":sqlight"))
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.activity:activity-compose:1.7.1")

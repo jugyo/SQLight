@@ -1,2 +1,2 @@
-include(":litesqlite")
+include(":sqlight")
 include(":sample")
